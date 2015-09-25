@@ -33,54 +33,34 @@
 #   mirroring all components.
 #   Default: []
 #
-# [*architectures*]
-#   Architectures to mirror. If attribute is ommited Aptly will mirror all
-#   available architectures.
-#   Default: []
-#
-# [*with_sources*]
-#   Boolean to control whether Aptly should download source packages in addition
-#   to binary packages.
-#   Default: false
-#
-# [*with_udebs*]
-#   Boolean to control whether Aptly should also download .udeb packages.
-#   Default: false
+# [*cmd_options*]
+#   Hash containing the command line options that will be passed to aptly.
 #
 define aptly::mirror (
   $location,
-  $key           = undef,
-  $keyserver     = 'keyserver.ubuntu.com',
-  $release       = $::lsbdistcodename,
-  $architectures = [],
-  $repos         = [],
-  $with_sources  = false,
-  $with_udebs    = false,
+  $key               = undef,
+  $keyserver         = 'keyserver.ubuntu.com',
+  $release           = $::lsbdistcodename,
+  $repos             = [],
+  $cmd_options       = {},
 ) {
   validate_string($keyserver)
   validate_array($repos)
-  validate_array($architectures)
-  validate_bool($with_sources)
-  validate_bool($with_udebs)
+  validate_hash($cmd_options)
+
+  $default_cmd_options = {
+    '-architectures'    => "",
+    '-with-sources'     => false,
+    '-with-udebs'       => false,
+    '-force-components' => false,
+  }
 
   include ::aptly
 
   $gpg_cmd = '/usr/bin/gpg --no-default-keyring --keyring trustedkeys.gpg'
   $aptly_cmd = "${::aptly::aptly_cmd} mirror"
 
-  if empty($architectures) {
-    $architectures_arg = ''
-  } else{
-    $architectures_as_s = join($architectures, ',')
-    $architectures_arg = "-architectures=\"${architectures_as_s}\""
-  }
-
-  if empty($repos) {
-    $components_arg = ''
-  } else {
-    $components = join($repos, ' ')
-    $components_arg = " ${components}"
-  }
+  $components = join($repos, ' ')
 
   if is_array($key) {
     $key_string = join($key, "' '")
@@ -97,8 +77,11 @@ define aptly::mirror (
     user    => $::aptly::user,
   }
 
+  $cmd_options_string = join(reject(join_keys_to_values(merge($default_cmd_options, $cmd_options), '='), '.*=$'), " ")
+  $cmd_string         = rstrip("${aptly_cmd} create ${cmd_options_string} ${title} ${location} ${release} ${components}")
+
   exec { "aptly_mirror_create-${title}":
-    command => "${aptly_cmd} create ${architectures_arg} -with-sources=${with_sources} -with-udebs=${with_udebs} ${title} ${location} ${release}${components_arg}",
+    command => $cmd_string,
     unless  => "${aptly_cmd} show ${title} >/dev/null",
     user    => $::aptly::user,
     require => [
