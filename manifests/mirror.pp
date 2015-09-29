@@ -77,6 +77,17 @@ define aptly::mirror (
       unless  => "echo '${key_string}' | xargs -n1 ${gpg_cmd} --list-keys",
       user    => $::aptly::user,
     }
+
+    $exec_aptly_mirror_create_require = [
+      Package['aptly'],
+      File['/etc/aptly.conf'],
+      Exec["aptly_mirror_gpg-${title}"],
+    ]
+  } else {
+    $exec_aptly_mirror_create_require = [
+      Package['aptly'],
+      File['/etc/aptly.conf'],
+    ]
   }
 
   $cmd_options_string = join(reject(join_keys_to_values(merge($default_cmd_options, $cmd_options), '='), '.*=$'), " ")
@@ -86,10 +97,6 @@ define aptly::mirror (
     command => $cmd_string,
     unless  => "${aptly_cmd} show ${title} >/dev/null",
     user    => $::aptly::user,
-    require => [
-      Package['aptly'],
-      File['/etc/aptly.conf'],
-      Exec["aptly_mirror_gpg-${title}"],
-    ],
+    require => $exec_aptly_mirror_create_require,
   }
 }
