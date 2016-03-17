@@ -4,8 +4,6 @@
 # or publish the mirror for you, because it will take a long time and it
 # doesn't make sense to schedule these actions frequenly in Puppet.
 #
-# The parameters are intended to be analogous to `apt::source`.
-#
 # NB: This will not recreate the mirror if the params change! You will need
 # to manually `aptly mirror drop <name>` after also dropping all snapshot
 # and publish references.
@@ -65,7 +63,7 @@ define aptly::mirror (
   if $key {
     if is_array($key) {
       $key_string = join($key, "' '")
-    } elsif is_string($key) {
+    } elsif is_string($key) or is_integer($key) {
       $key_string = $key
     } else {
       fail('$key is neither a string nor an array!')

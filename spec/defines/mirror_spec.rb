@@ -5,6 +5,7 @@ describe 'aptly::mirror' do
   let(:facts) {{
     :lsbdistid       => 'Debian',
     :lsbdistcodename => 'precise',
+    :osfamily        => 'Debian',
   }}
 
   describe 'param defaults and mandatory' do
@@ -148,7 +149,7 @@ describe 'aptly::mirror' do
     context 'no key passed' do
       let(:params) {
         {
-          :location   => 'http://repo.example.com',
+          :location => 'http://repo.example.com',
         }
       }
 

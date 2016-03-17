@@ -69,15 +69,14 @@ class aptly (
 
   if $repo {
     apt::source { 'aptly':
-      location    => 'http://repo.aptly.info',
-      release     => 'squeeze',
-      repos       => 'main',
-      key_server  => $key_server,
-      key         => 'B6140515643C2AE155596690E083A3782A194991',
-      include_src => false,
+      location   => 'http://repo.aptly.info',
+      release    => 'squeeze',
+      repos      => 'main',
+      key_server => $key_server,
+      key        => 'DF32BC15E2145B3FA151AED19E3E53F19C7DE460',
     }
 
-    Apt::Source['aptly'] -> Package['aptly']
+    Apt::Source['aptly'] -> Class['apt::update'] -> Package['aptly']
   }
 
   package { 'aptly':

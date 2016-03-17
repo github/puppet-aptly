@@ -23,33 +23,38 @@
 # [*log*]
 #   Enable or disable Upstart logging.
 #   Default: none
-
+#
+# [*enable_cli_and_http*]
+#   Enable concurrent use of command line (CLI) and HTTP APIs with
+#   the same Aptly root.
+#
 class aptly::api (
-  $ensure         = running,
-  $user           = 'root',
-  $group          = 'root',
-  $listen         = ':8080',
-  $log            = 'none',
+  $ensure              = running,
+  $user                = 'root',
+  $group               = 'root',
+  $listen              = ':8080',
+  $log                 = 'none',
+  $enable_cli_and_http = false,
   ) {
-    
+
     validate_re($ensure, ['^stopped|running$'], 'Valid values for $ensure: stopped, running')
-    
+
     validate_string($user, $group)
-    
+
     validate_re($listen, ['^[0-9.]*:[0-9]+$'], 'Valid values for $listen: :port, <ip>:<port>')
-    
+
     validate_re($log, ['^none|log$'], 'Valid values for $log: none, log')
-    
+
     file{'aptly-upstart':
       path    => '/etc/init/aptly-api.conf',
       content => template('aptly/etc/aptly.init.erb'),
     }
-    
+
     service{'aptly-api':
       ensure => $ensure,
       enable => true,
     }
-    
+
     File['aptly-upstart'] ~> Service['aptly-api']
-  
+
 }
