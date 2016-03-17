@@ -47,7 +47,7 @@ define aptly::mirror (
   validate_hash($cmd_options)
 
   $default_cmd_options = {
-    '-architectures'    => "",
+    '-architectures'    => '',
     '-with-sources'     => false,
     '-with-udebs'       => false,
     '-force-components' => false,
@@ -88,7 +88,7 @@ define aptly::mirror (
     ]
   }
 
-  $cmd_options_string = join(reject(join_keys_to_values(merge($default_cmd_options, $cmd_options), '='), '.*=$'), " ")
+  $cmd_options_string = join(reject(join_keys_to_values(merge($default_cmd_options, $cmd_options), '='), '.*=$'), ' ')
   $cmd_string         = rstrip("${aptly_cmd} create ${cmd_options_string} ${title} ${location} ${release} ${components}")
 
   exec { "aptly_mirror_create-${title}":
