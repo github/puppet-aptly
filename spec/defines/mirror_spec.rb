@@ -24,7 +24,7 @@ describe 'aptly::mirror' do
 
     it {
       should contain_exec('aptly_mirror_create-example').with({
-        :command => /aptly -config \/etc\/aptly.conf mirror create *-with-sources=false -with-udebs=false example http:\/\/repo\.example\.com precise$/,
+        :command => /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/,
         :unless  => /aptly -config \/etc\/aptly.conf mirror show example >\/dev\/null$/,
         :user    => 'root',
         :require => [
@@ -72,7 +72,7 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with({
-          :command => /aptly -config \/etc\/aptly.conf mirror create *-with-sources=false -with-udebs=false example http:\/\/repo\.example\.com precise$/,
+          :command => /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/,
           :unless  => /aptly -config \/etc\/aptly.conf mirror show example >\/dev\/null$/,
           :user    => 'custom_user',
           :require => [
@@ -222,7 +222,7 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create *-with-sources=false -with-udebs=false example http:\/\/repo\.example\.com precise main$/
+          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise main$/
         )
       }
     end
@@ -236,152 +236,71 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create *-with-sources=false -with-udebs=false example http:\/\/repo\.example\.com precise main contrib non-free$/
+          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise main contrib non-free$/
         )
       }
     end
   end
 
-  describe '#architectures' do
-    context 'not an array' do
+  describe '#cmd_options' do
+    context 'not a hash' do
       let(:params) {{
-        :location      => 'http://repo.example.com',
-        :key           => 'ABC123',
-        :architectures => 'this is a string',
+        :location    => 'http://repo.example.com',
+        :key         => 'ABC123',
+        :cmd_options => 'this is a string',
       }}
 
       it {
-        should raise_error(Puppet::Error, /is not an Array/)
+        should raise_error(Puppet::Error, /is not a Hash/)
       }
     end
 
-    context 'single item' do
+    context 'with valid options' do
       let(:params) {{
-	:location      => 'http://repo.example.com',
-	:key           => 'ABC123',
-	:architectures => ['amd64'],
-      }}
-
-      it {
-	should contain_exec('aptly_mirror_create-example').with_command(
-	  /aptly -config \/etc\/aptly.conf mirror create -architectures="amd64" -with-sources=false -with-udebs=false example http:\/\/repo\.example\.com precise$/
-	)
-      }
-    end
-
-    context 'multiple items' do
-      let(:params) {{
-        :location      => 'http://repo.example.com',
-        :key           => 'ABC123',
-        :architectures => ['i386', 'amd64','armhf'],
+        :location    => 'http://repo.example.com',
+        :key         => 'ABC123',
+        :cmd_options => {
+          '-with-sources'     => false,
+          '-with-udebs'       => false,
+          '-force-components' => false,
+        }
       }}
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -architectures="i386,amd64,armhf" -with-sources=false -with-udebs=false example http:\/\/repo\.example\.com precise$/
+          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/
         )
       }
     end
-  end
 
-  describe '#with_sources' do
-    context 'not a boolean' do
+    context 'default options' do
       let(:params) {{
-        :location     => 'http://repo.example.com',
-        :key          => 'ABC123',
-        :with_sources => 'this is a string',
-      }}
-
-      it {
-        should raise_error(Puppet::Error, /is not a boolean/)
-      }
-    end
-
-    context 'with boolean true' do
-      let(:params) {{
-        :location     => 'http://repo.example.com',
-        :key          => 'ABC123',
-        :with_sources => true,
+        :location    => 'http://repo.example.com',
+        :key         => 'ABC123',
+        :cmd_options => {}
       }}
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create *-with-sources=true -with-udebs=false example http:\/\/repo\.example\.com precise$/
+          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/
         )
       }
     end
-  end
 
-  describe '#with_udebs' do
-    context 'not a boolean' do
+    context 'overriding options' do
       let(:params) {{
-        :location   => 'http://repo.example.com',
-        :key        => 'ABC123',
-        :with_udebs => 'this is a string',
-      }}
-
-      it {
-        should raise_error(Puppet::Error, /is not a boolean/)
-      }
-    end
-
-    context 'with boolean true' do
-      let(:params) {{
-        :location   => 'http://repo.example.com',
-        :key        => 'ABC123',
-        :with_udebs => true,
+        :location    => 'http://repo.example.com',
+        :key         => 'ABC123',
+        :cmd_options => {
+          '-force-components' => true,
+        }
       }}
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create *-with-sources=false -with-udebs=true example http:\/\/repo\.example\.com precise$/
+          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=true example http:\/\/repo\.example\.com precise$/
         )
       }
     end
   end
-
-  describe '#filter_with_deps' do
-    context 'not a boolean' do
-      let(:params) {{
-        :location         => 'http://repo.example.com',
-        :key              => 'ABC123',
-        :filter_with_deps => 'this is a string',
-      }}
-
-      it {
-        should raise_error(Puppet::Error, /is not a boolean/)
-      }
-    end
-
-    context 'with boolean true' do
-      let(:params) {{
-        :location         => 'http://repo.example.com',
-        :key              => 'ABC123',
-        :filter_with_deps => true,
-      }}
-
-      it {
-        should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create *-with-sources=false -with-udebs=false -filter-with-deps example http:\/\/repo\.example\.com precise$/
-        )
-      }
-    end
-  end
-
-  describe '#filter' do
-    context 'with filter' do
-      let(:params){{
-        :location   => 'http://repo.example.com',
-        :key        => 'ABC123',
-        :filter     => 'this is a string',
-      }}
-  
-      it {
-        should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create *-with-sources=false -with-udebs=false -filter="this is a string" example http:\/\/repo\.example\.com precise$/
-        )
-      }
-    end
-  end
-
 end
