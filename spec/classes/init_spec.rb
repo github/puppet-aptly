@@ -114,6 +114,28 @@ EOS
     end
   end
 
+  describe '#create_config' do
+    context 'true' do
+      let(:params) {{
+        :config_contents => '{"rootDir":"/srv/aptly", "architectures":["i386", "amd64"]}',
+        :create_config   => true,
+      }}
+
+      it {
+        should contain_file('/etc/aptly.conf').with_content(params[:config_contents])
+      }
+    end
+
+    context 'false' do
+      let(:params) {{
+        :config_contents => '{"rootDir":"/srv/aptly", "architectures":["i386", "amd64"]}',
+        :create_config   => false,
+      }}
+
+      it { should_not contain_file('/etc/aptly.conf') }
+    end
+  end
+
   describe '#repo' do
     context 'not a bool' do
       let(:params) {{

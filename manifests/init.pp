@@ -21,6 +21,10 @@
 #   See http://www.aptly.info/#configuration
 #   Default: {}
 #
+# [*create_config*]
+#   Whether to create a config file or not
+#   Default: true
+#
 # [*repo*]
 #   Whether to configure an apt::source for `repo.aptly.info`.
 #   You might want to disable this if/when you've mirrored that yourself.
@@ -48,6 +52,7 @@ class aptly (
   $config_file     = '/etc/aptly.conf',
   $config          = {},
   $config_contents = undef,
+  $create_config   = true,
   $repo            = true,
   $key_server      = undef,
   $user            = 'root',
@@ -57,6 +62,7 @@ class aptly (
 
   validate_absolute_path($config_file)
   validate_hash($config)
+  validate_bool($create_config)
   validate_hash($aptly_repos)
   validate_hash($aptly_mirrors)
   validate_bool($repo)
@@ -84,14 +90,16 @@ class aptly (
     ensure  => $package_ensure,
   }
 
-  $config_file_contents = $config_contents ? {
-    undef   => inline_template("<%= Hash[@config.sort].to_pson %>\n"),
-    default => $config_contents,
-  }
+  if $create_config {
+    $config_file_contents = $config_contents ? {
+      undef   => inline_template("<%= Hash[@config.sort].to_pson %>\n"),
+      default => $config_contents,
+    }
 
-  file { $config_file:
-    ensure  => file,
-    content => $config_file_contents,
+    file { $config_file:
+      ensure  => file,
+      content => $config_file_contents,
+    }
   }
 
   $aptly_cmd = "/usr/bin/aptly -config ${config_file}"
