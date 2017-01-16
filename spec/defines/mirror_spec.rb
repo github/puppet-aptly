@@ -29,7 +29,6 @@ describe 'aptly::mirror' do
         :user    => 'root',
         :require => [
           'Package[aptly]',
-          'File[/etc/aptly.conf]',
           'Exec[aptly_mirror_gpg-example]'
         ],
       })
@@ -77,7 +76,6 @@ describe 'aptly::mirror' do
           :user    => 'custom_user',
           :require => [
             'Package[aptly]',
-            'File[/etc/aptly.conf]',
             'Exec[aptly_mirror_gpg-example]'
           ],
         })
