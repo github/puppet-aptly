@@ -24,8 +24,8 @@ describe 'aptly::mirror' do
 
     it {
       should contain_exec('aptly_mirror_create-example').with({
-        :command => /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/,
-        :unless  => /aptly -config \/etc\/aptly.conf mirror show example >\/dev\/null$/,
+        :command => /aptly mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/,
+        :unless  => /aptly mirror show example >\/dev\/null$/,
         :user    => 'root',
         :require => [
           'Package[aptly]',
@@ -72,8 +72,8 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with({
-          :command => /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/,
-          :unless  => /aptly -config \/etc\/aptly.conf mirror show example >\/dev\/null$/,
+          :command => /aptly mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/,
+          :unless  => /aptly mirror show example >\/dev\/null$/,
           :user    => 'custom_user',
           :require => [
             'Package[aptly]',
@@ -222,7 +222,7 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise main$/
+          /aptly mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise main$/
         )
       }
     end
@@ -236,7 +236,7 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise main contrib non-free$/
+          /aptly mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise main contrib non-free$/
         )
       }
     end
@@ -268,7 +268,7 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/
+          /aptly mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/
         )
       }
     end
@@ -282,7 +282,7 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/
+          /aptly mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/
         )
       }
     end
@@ -298,7 +298,7 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=true example http:\/\/repo\.example\.com precise$/
+          /aptly mirror create -with-sources=false -with-udebs=false -force-components=true example http:\/\/repo\.example\.com precise$/
         )
       }
     end

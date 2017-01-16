@@ -102,7 +102,7 @@ class aptly (
     }
   }
 
-  $aptly_cmd = "/usr/bin/aptly -config ${config_file}"
+  $aptly_cmd = '/usr/bin/aptly'
 
   # Hiera support
   create_resources('::aptly::repo', $aptly_repos)

@@ -11,8 +11,8 @@ describe 'aptly::repo' do
   describe 'param defaults' do
     it {
         should contain_exec('aptly_repo_create-example').with({
-          :command  => /aptly -config \/etc\/aptly.conf repo create *example$/,
-          :unless   => /aptly -config \/etc\/aptly.conf repo show example >\/dev\/null$/,
+          :command  => /aptly repo create *example$/,
+          :unless   => /aptly repo show example >\/dev\/null$/,
           :user     => 'root',
           :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
       })
@@ -26,8 +26,8 @@ describe 'aptly::repo' do
 
     it {
         should contain_exec('aptly_repo_create-example').with({
-          :command  => /aptly -config \/etc\/aptly.conf repo create *-component="third-party" *example$/,
-          :unless   => /aptly -config \/etc\/aptly.conf repo show example >\/dev\/null$/,
+          :command  => /aptly repo create *-component="third-party" *example$/,
+          :unless   => /aptly repo show example >\/dev\/null$/,
           :user     => 'root',
           :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
       })
@@ -47,8 +47,8 @@ describe 'aptly::repo' do
 
       it {
           should contain_exec('aptly_repo_create-example').with({
-            :command  => /aptly -config \/etc\/aptly.conf repo create *-component="third-party" *example$/,
-            :unless   => /aptly -config \/etc\/aptly.conf repo show example >\/dev\/null$/,
+            :command  => /aptly repo create *-component="third-party" *example$/,
+            :unless   => /aptly repo show example >\/dev\/null$/,
             :user     => 'custom_user',
             :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
         })
@@ -64,8 +64,8 @@ describe 'aptly::repo' do
 
       it {
         should contain_exec('aptly_repo_create-example').with({
-          :command  => /aptly -config \/etc\/aptly.conf repo create *-architectures="i386,amd64" *example$/,
-          :unless   => /aptly -config \/etc\/aptly.conf repo show example >\/dev\/null$/,
+          :command  => /aptly repo create *-architectures="i386,amd64" *example$/,
+          :unless   => /aptly repo show example >\/dev\/null$/,
           :user     => 'root',
           :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
         })
@@ -90,8 +90,8 @@ describe 'aptly::repo' do
 
     it {
       should contain_exec('aptly_repo_create-example').with({
-        :command  => /aptly -config \/etc\/aptly.conf repo create *-comment="example comment" *example$/,
-        :unless   => /aptly -config \/etc\/aptly.conf repo show example >\/dev\/null$/,
+        :command  => /aptly repo create *-comment="example comment" *example$/,
+        :unless   => /aptly repo show example >\/dev\/null$/,
         :user     => 'root',
         :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
       })
@@ -105,8 +105,8 @@ describe 'aptly::repo' do
 
     it {
       should contain_exec('aptly_repo_create-example').with({
-        :command  => /aptly -config \/etc\/aptly.conf repo create *-distribution="example_distribution" *example$/,
-        :unless   => /aptly -config \/etc\/aptly.conf repo show example >\/dev\/null$/,
+        :command  => /aptly repo create *-distribution="example_distribution" *example$/,
+        :unless   => /aptly repo show example >\/dev\/null$/,
         :user     => 'root',
         :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
       })

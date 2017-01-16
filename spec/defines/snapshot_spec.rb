@@ -11,8 +11,8 @@ describe 'aptly::snapshot' do
   describe 'param defaults' do
     it {
         should contain_exec('aptly_snapshot_create-example').with({
-          :command  => /aptly -config \/etc\/aptly.conf snapshot create example empty$/,
-          :unless   => /aptly -config \/etc\/aptly.conf snapshot show example >\/dev\/null$/,
+          :command  => /aptly snapshot create example empty$/,
+          :unless   => /aptly snapshot show example >\/dev\/null$/,
           :user     => 'root',
           :require  => 'Class[Aptly]',
       })
@@ -38,8 +38,8 @@ describe 'aptly::snapshot' do
 
       it {
           should contain_exec('aptly_snapshot_create-example').with({
-            :command  => /aptly -config \/etc\/aptly.conf snapshot create example from repo example_repo$/,
-            :unless   => /aptly -config \/etc\/aptly.conf snapshot show example >\/dev\/null$/,
+            :command  => /aptly snapshot create example from repo example_repo$/,
+            :unless   => /aptly snapshot show example >\/dev\/null$/,
             :user     => 'root',
             :require  => 'Class[Aptly]',
         })
@@ -53,8 +53,8 @@ describe 'aptly::snapshot' do
 
       it {
           should contain_exec('aptly_snapshot_create-example').with({
-            :command  => /aptly -config \/etc\/aptly.conf snapshot create example from mirror example_mirror$/,
-            :unless   => /aptly -config \/etc\/aptly.conf snapshot show example >\/dev\/null$/,
+            :command  => /aptly snapshot create example from mirror example_mirror$/,
+            :unless   => /aptly snapshot show example >\/dev\/null$/,
             :user     => 'root',
             :require  => 'Class[Aptly]',
         })
