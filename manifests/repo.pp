@@ -6,67 +6,32 @@
 #
 # === Parameters
 #
-# [*architectures*]
-#   Specify the list of supported architectures as an Array. If ommited Aptly
-#   assumes the repository.
-#
-# [*comment*]
-#   Specifiy a comment to be set for the repository.
-#
-# [*component*]
-#   Specify which component to put the package in. This option will only works
-#   for aptly version >= 0.5.0.
-#
-# [*distribution*]
-#   Specify the default distribution to be used when publishing this repository.
+# [*cli_options*]
+#   Hash containing the command line options that will be passed to aptly.
 
 define aptly::repo(
-  $architectures = [],
-  $comment       = '',
-  $component     = '',
-  $distribution  = '',
+  $cli_options   = {},
 ){
-  validate_array($architectures)
-  validate_string($comment)
-  validate_string($component)
-  validate_string($distribution)
+  validate_hash($cli_options)
+
+  $default_cli_options = {
+    '-architectures' => '',
+    '-comment'       => '',
+    '-component'     => '',
+    '-distribution'  => '',
+  }
 
   include ::aptly
 
   $aptly_cmd = "${::aptly::aptly_cmd} repo"
 
-  if empty($architectures) {
-    $architectures_arg = ''
-  } else{
-    $architectures_as_s = join($architectures, ',')
-    $architectures_arg = "-architectures=\"${architectures_as_s}\""
-  }
-
-  if empty($comment) {
-    $comment_arg = ''
-  } else{
-    $comment_arg = "-comment=\"${comment}\""
-  }
-
-  if empty($component) {
-    $component_arg = ''
-  } else{
-    $component_arg = "-component=\"${component}\""
-  }
-
-  if empty($distribution) {
-    $distribution_arg = ''
-  } else{
-    $distribution_arg = "-distribution=\"${distribution}\""
-  }
+  $cli_options_string = join(reject(join_keys_to_values(merge($default_cli_options, $cli_options), '='), '.*=$'), ' ')
+  $cmd_string         = rstrip("${aptly_cmd} create ${cli_options_string} ${title}")
 
   exec{ "aptly_repo_create-${title}":
-    command => "${aptly_cmd} create ${architectures_arg} ${comment_arg} ${component_arg} ${distribution_arg} ${title}",
+    command => $cmd_string,
     unless  => "${aptly_cmd} show ${title} >/dev/null",
     user    => $::aptly::user,
-    require => [
-      Package['aptly'],
-      File['/etc/aptly.conf'],
-    ],
+    require => Package['aptly'],
   }
 }

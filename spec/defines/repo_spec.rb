@@ -14,22 +14,24 @@ describe 'aptly::repo' do
           :command  => /aptly repo create *example$/,
           :unless   => /aptly repo show example >\/dev\/null$/,
           :user     => 'root',
-          :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
+          :require  => 'Package[aptly]',
       })
     }
   end
 
   describe 'user defined component' do
     let(:params){{
-      :component => 'third-party',
+      :cli_options => {
+        '-component' => 'third-party'
+      }
     }}
 
     it {
         should contain_exec('aptly_repo_create-example').with({
-          :command  => /aptly repo create *-component="third-party" *example$/,
+          :command  => /aptly repo create *-component=third-party *example$/,
           :unless   => /aptly repo show example >\/dev\/null$/,
           :user     => 'root',
-          :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
+          :require  => 'Package[aptly]',
       })
     }
 
@@ -42,15 +44,17 @@ describe 'aptly::repo' do
       }
 
       let(:params){{
-        :component => 'third-party',
+        :cli_options => {
+          '-component' => 'third-party'
+        }
       }}
 
       it {
           should contain_exec('aptly_repo_create-example').with({
-            :command  => /aptly repo create *-component="third-party" *example$/,
+            :command  => /aptly repo create *-component=third-party *example$/,
             :unless   => /aptly repo show example >\/dev\/null$/,
             :user     => 'custom_user',
-            :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
+            :require  => 'Package[aptly]',
         })
       }
     end
@@ -59,56 +63,52 @@ describe 'aptly::repo' do
   describe 'user defined architectures' do
     context 'passing valid values' do
       let(:params){{
-        :architectures => ['i386','amd64'],
+        :cli_options => {
+          '-architectures' => 'i386,amd64',
+        }
       }}
 
       it {
         should contain_exec('aptly_repo_create-example').with({
-          :command  => /aptly repo create *-architectures="i386,amd64" *example$/,
+          :command  => /aptly repo create *-architectures=i386,amd64 *example$/,
           :unless   => /aptly repo show example >\/dev\/null$/,
           :user     => 'root',
-          :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
+          :require  => 'Package[aptly]',
         })
-      }
-    end
-
-    context 'passing invalid values' do
-      let(:params){{
-        :architectures => 'amd64'
-      }}
-
-      it {
-        should raise_error(Puppet::Error, /is not an Array/)
       }
     end
   end
 
   describe 'user defined comment' do
     let(:params){{
-      :comment => 'example comment',
+      :cli_options => {
+        '-comment' => 'example comment'
+      }
     }}
 
     it {
       should contain_exec('aptly_repo_create-example').with({
-        :command  => /aptly repo create *-comment="example comment" *example$/,
+        :command  => /aptly repo create *-comment=example comment *example$/,
         :unless   => /aptly repo show example >\/dev\/null$/,
         :user     => 'root',
-        :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
+        :require  => 'Package[aptly]',
       })
     }
   end
 
   describe 'user defined distribution' do
     let(:params){{
-      :distribution => 'example_distribution',
+      :cli_options => {
+        '-distribution' => 'example_distribution'
+      }
     }}
 
     it {
       should contain_exec('aptly_repo_create-example').with({
-        :command  => /aptly repo create *-distribution="example_distribution" *example$/,
+        :command  => /aptly repo create *-distribution=example_distribution *example$/,
         :unless   => /aptly repo show example >\/dev\/null$/,
         :user     => 'root',
-        :require  => [ 'Package[aptly]','File[/etc/aptly.conf]' ],
+        :require  => 'Package[aptly]',
       })
     }
   end
