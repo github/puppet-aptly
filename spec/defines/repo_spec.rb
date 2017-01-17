@@ -113,4 +113,20 @@ describe 'aptly::repo' do
     }
   end
 
+  describe 'user defined configuration' do
+    let(:params){{
+      :cli_options => {
+        '-config' => '/tmp/aptly.conf'
+      }
+    }}
+
+    it {
+      should contain_exec('aptly_repo_create-example').with({
+        :command  => /aptly repo create *-config=\/tmp\/aptly.conf *example$/,
+        :unless   => /aptly repo show example >\/dev\/null$/,
+        :user     => 'root',
+        :require  => 'Package[aptly]',
+      })
+    }
+  end
 end

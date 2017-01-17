@@ -301,4 +301,26 @@ describe 'aptly::mirror' do
       }
     end
   end
+
+  describe 'user defined configuration' do
+    let(:params){{
+      :location => 'http://repo.example.com',
+      :key      => 'ABC123',
+      :cli_options => {
+        '-config' => '/tmp/aptly.conf'
+      }
+    }}
+
+    it {
+      should contain_exec('aptly_mirror_create-example').with({
+        :command => /aptly mirror create -with-sources=false -with-udebs=false -force-components=false -config=\/tmp\/aptly.conf example http:\/\/repo\.example\.com precise$/,
+        :unless  => /aptly mirror show example >\/dev\/null$/,
+        :user    => 'root',
+        :require => [
+          'Package[aptly]',
+          'Exec[aptly_mirror_gpg-example]'
+        ],
+      })
+    }
+  end
 end
