@@ -314,7 +314,7 @@ describe 'aptly::mirror' do
     it {
       should contain_exec('aptly_mirror_create-example').with({
         :command => /aptly mirror create -with-sources=false -with-udebs=false -force-components=false -config=\/tmp\/aptly.conf example http:\/\/repo\.example\.com precise$/,
-        :unless  => /aptly mirror show example >\/dev\/null$/,
+        :unless  => /aptly mirror show -config=\/tmp\/aptly.conf example >\/dev\/null$/,
         :user    => 'root',
         :require => [
           'Package[aptly]',

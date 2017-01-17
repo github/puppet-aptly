@@ -123,7 +123,7 @@ describe 'aptly::repo' do
     it {
       should contain_exec('aptly_repo_create-example').with({
         :command  => /aptly repo create *-config=\/tmp\/aptly.conf *example$/,
-        :unless   => /aptly repo show example >\/dev\/null$/,
+        :unless   => /aptly repo show *-config=\/tmp\/aptly.conf example >\/dev\/null$/,
         :user     => 'root',
         :require  => 'Package[aptly]',
       })
