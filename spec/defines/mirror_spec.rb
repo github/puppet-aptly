@@ -25,7 +25,7 @@ describe 'aptly::mirror' do
     it {
       should contain_exec('aptly_mirror_create-example').with({
         :command => /aptly mirror create *example http:\/\/repo\.example\.com precise$/,
-        :unless  => /aptly mirror show example >\/dev\/null$/,
+        :unless  => /aptly mirror show *example >\/dev\/null$/,
         :user    => 'root',
         :require => [
           'Package[aptly]',
@@ -72,7 +72,7 @@ describe 'aptly::mirror' do
       it {
         should contain_exec('aptly_mirror_create-example').with({
           :command => /aptly mirror create *example http:\/\/repo\.example\.com precise$/,
-          :unless  => /aptly mirror show example >\/dev\/null$/,
+          :unless  => /aptly mirror show *example >\/dev\/null$/,
           :user    => 'custom_user',
           :require => [
             'Package[aptly]',

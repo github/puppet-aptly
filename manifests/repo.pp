@@ -21,9 +21,17 @@ define aptly::repo(
   $cli_options_string = join(reject(join_keys_to_values($cli_options, '='), '.*=$'), ' ')
   $cmd_string         = rstrip("${aptly_cmd} create ${cli_options_string} ${title}")
 
+  # Since the create and show commands don't share a common set of
+  # options, we need to extract the config
+  if has_key($cli_options, '-config') {
+    $config_string = "-config=${cli_options['-config']}"
+  } else {
+    $config_string = ''
+  }
+
   exec{ "aptly_repo_create-${title}":
     command => $cmd_string,
-    unless  => "${aptly_cmd} show ${title} >/dev/null",
+    unless  => "${aptly_cmd} show ${config_string} ${title} >/dev/null",
     user    => $::aptly::user,
     require => Package['aptly'],
   }

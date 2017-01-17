@@ -12,7 +12,7 @@ describe 'aptly::repo' do
     it {
         should contain_exec('aptly_repo_create-example').with({
           :command  => /aptly repo create *example$/,
-          :unless   => /aptly repo show example >\/dev\/null$/,
+          :unless   => /aptly repo show *example >\/dev\/null$/,
           :user     => 'root',
           :require  => 'Package[aptly]',
       })
@@ -29,7 +29,7 @@ describe 'aptly::repo' do
     it {
         should contain_exec('aptly_repo_create-example').with({
           :command  => /aptly repo create *-component=third-party *example$/,
-          :unless   => /aptly repo show example >\/dev\/null$/,
+          :unless   => /aptly repo show *example >\/dev\/null$/,
           :user     => 'root',
           :require  => 'Package[aptly]',
       })
@@ -52,7 +52,7 @@ describe 'aptly::repo' do
       it {
           should contain_exec('aptly_repo_create-example').with({
             :command  => /aptly repo create *-component=third-party *example$/,
-            :unless   => /aptly repo show example >\/dev\/null$/,
+            :unless   => /aptly repo show *example >\/dev\/null$/,
             :user     => 'custom_user',
             :require  => 'Package[aptly]',
         })
@@ -71,7 +71,7 @@ describe 'aptly::repo' do
       it {
         should contain_exec('aptly_repo_create-example').with({
           :command  => /aptly repo create *-architectures=i386,amd64 *example$/,
-          :unless   => /aptly repo show example >\/dev\/null$/,
+          :unless   => /aptly repo show *example >\/dev\/null$/,
           :user     => 'root',
           :require  => 'Package[aptly]',
         })
@@ -89,7 +89,7 @@ describe 'aptly::repo' do
     it {
       should contain_exec('aptly_repo_create-example').with({
         :command  => /aptly repo create *-comment=example comment *example$/,
-        :unless   => /aptly repo show example >\/dev\/null$/,
+        :unless   => /aptly repo show *example >\/dev\/null$/,
         :user     => 'root',
         :require  => 'Package[aptly]',
       })
@@ -106,7 +106,7 @@ describe 'aptly::repo' do
     it {
       should contain_exec('aptly_repo_create-example').with({
         :command  => /aptly repo create *-distribution=example_distribution *example$/,
-        :unless   => /aptly repo show example >\/dev\/null$/,
+        :unless   => /aptly repo show *example >\/dev\/null$/,
         :user     => 'root',
         :require  => 'Package[aptly]',
       })
