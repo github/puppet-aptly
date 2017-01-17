@@ -23,6 +23,14 @@ define aptly::snapshot (
 
   $cli_options_string = join(reject(join_keys_to_values($cli_options, '='), '.*=$'), ' ')
 
+  # Since the create and show commands don't share a common set of
+  # options, we need to extract the config
+  if has_key($cli_options, '-config') {
+    $config_string = "-config=${cli_options['-config']}"
+  } else {
+    $config_string = ''
+  }
+
   if $repo and $mirror {
     fail('$repo and $mirror are mutually exclusive.')
   }
@@ -38,7 +46,7 @@ define aptly::snapshot (
 
   exec { "aptly_snapshot_create-${title}":
     command => "${aptly_cmd} ${cli_options_string} ${aptly_args}",
-    unless  => "${aptly_cmd} ${cli_options_string} show ${title} >/dev/null",
+    unless  => "${aptly_cmd} ${config_string} show ${title} >/dev/null",
     user    => $::aptly::user,
     require => Class['aptly'],
   }
