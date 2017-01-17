@@ -240,12 +240,12 @@ describe 'aptly::mirror' do
     end
   end
 
-  describe '#cmd_options' do
+  describe '#cli_options' do
     context 'not a hash' do
       let(:params) {{
         :location    => 'http://repo.example.com',
         :key         => 'ABC123',
-        :cmd_options => 'this is a string',
+        :cli_options => 'this is a string',
       }}
 
       it {
@@ -257,7 +257,7 @@ describe 'aptly::mirror' do
       let(:params) {{
         :location    => 'http://repo.example.com',
         :key         => 'ABC123',
-        :cmd_options => {
+        :cli_options => {
           '-with-sources'     => false,
           '-with-udebs'       => false,
           '-force-components' => false,
@@ -275,7 +275,7 @@ describe 'aptly::mirror' do
       let(:params) {{
         :location    => 'http://repo.example.com',
         :key         => 'ABC123',
-        :cmd_options => {}
+        :cli_options => {}
       }}
 
       it {
@@ -289,7 +289,7 @@ describe 'aptly::mirror' do
       let(:params) {{
         :location    => 'http://repo.example.com',
         :key         => 'ABC123',
-        :cmd_options => {
+        :cli_options => {
           '-force-components' => true,
         }
       }}
