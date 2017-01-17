@@ -11,8 +11,8 @@ describe 'aptly::snapshot' do
   describe 'param defaults' do
     it {
         should contain_exec('aptly_snapshot_create-example').with({
-          :command  => /aptly snapshot create example empty$/,
-          :unless   => /aptly snapshot show example >\/dev\/null$/,
+          :command  => /aptly snapshot *create example empty$/,
+          :unless   => /aptly snapshot *show example >\/dev\/null$/,
           :user     => 'root',
           :require  => 'Class[Aptly]',
       })
@@ -38,8 +38,8 @@ describe 'aptly::snapshot' do
 
       it {
           should contain_exec('aptly_snapshot_create-example').with({
-            :command  => /aptly snapshot create example from repo example_repo$/,
-            :unless   => /aptly snapshot show example >\/dev\/null$/,
+            :command  => /aptly snapshot *create example from repo example_repo$/,
+            :unless   => /aptly snapshot *show example >\/dev\/null$/,
             :user     => 'root',
             :require  => 'Class[Aptly]',
         })
@@ -53,13 +53,30 @@ describe 'aptly::snapshot' do
 
       it {
           should contain_exec('aptly_snapshot_create-example').with({
-            :command  => /aptly snapshot create example from mirror example_mirror$/,
-            :unless   => /aptly snapshot show example >\/dev\/null$/,
+            :command  => /aptly snapshot *create example from mirror example_mirror$/,
+            :unless   => /aptly snapshot *show example >\/dev\/null$/,
             :user     => 'root',
             :require  => 'Class[Aptly]',
         })
       }
     end
 
+    context 'passing cli options' do
+      let(:params){{
+        :mirror   => 'example_mirror',
+        :cli_options => {
+          '-config' => '/tmp/aptly.conf'
+        }
+      }}
+
+      it {
+          should contain_exec('aptly_snapshot_create-example').with({
+            :command  => /aptly snapshot -config=\/tmp\/aptly.conf *create example from mirror example_mirror$/,
+            :unless   => /aptly snapshot -config=\/tmp\/aptly.conf *show example >\/dev\/null$/,
+            :user     => 'root',
+            :require  => 'Class[Aptly]',
+        })
+      }
+    end
   end
 end
