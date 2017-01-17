@@ -53,13 +53,6 @@ define aptly::mirror (
   validate_array($environment)
   validate_hash($cli_options)
 
-  $default_cli_options = {
-    '-architectures'    => '',
-    '-with-sources'     => false,
-    '-with-udebs'       => false,
-    '-force-components' => false,
-  }
-
   include ::aptly
 
   $gpg_cmd = '/usr/bin/gpg --no-default-keyring --keyring trustedkeys.gpg'
@@ -93,7 +86,7 @@ define aptly::mirror (
     ]
   }
 
-  $cli_options_string = join(reject(join_keys_to_values(merge($default_cli_options, $cli_options), '='), '.*=$'), ' ')
+  $cli_options_string = join(reject(join_keys_to_values($cli_options, '='), '.*=$'), ' ')
   $cmd_string         = rstrip("${aptly_cmd} create ${cli_options_string} ${title} ${location} ${release} ${components}")
 
   exec { "aptly_mirror_create-${title}":

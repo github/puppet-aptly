@@ -14,18 +14,11 @@ define aptly::repo(
 ){
   validate_hash($cli_options)
 
-  $default_cli_options = {
-    '-architectures' => '',
-    '-comment'       => '',
-    '-component'     => '',
-    '-distribution'  => '',
-  }
-
   include ::aptly
 
   $aptly_cmd = "${::aptly::aptly_cmd} repo"
 
-  $cli_options_string = join(reject(join_keys_to_values(merge($default_cli_options, $cli_options), '='), '.*=$'), ' ')
+  $cli_options_string = join(reject(join_keys_to_values($cli_options, '='), '.*=$'), ' ')
   $cmd_string         = rstrip("${aptly_cmd} create ${cli_options_string} ${title}")
 
   exec{ "aptly_repo_create-${title}":
