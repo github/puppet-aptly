@@ -11,7 +11,11 @@
 # [*config_file*]
 #   Absolute path to the configuration file. Defaults to
 #   `/etc/aptly.conf`.
-
+#
+# [*config_dir*]
+#   Absolute path to the configuration directory, used in multi root
+#   setups. Defaults to `/etc/aptly.conf.d`.
+#
 # [*config_contents*]
 #   Contents of the config file.
 #   Default: undef
@@ -50,6 +54,7 @@
 class aptly (
   $package_ensure  = present,
   $config_file     = '/etc/aptly.conf',
+  $config_dir      = '/etc/aptly.conf.d',
   $config          = {},
   $config_contents = undef,
   $single_root     = true,
@@ -99,6 +104,10 @@ class aptly (
     file { $config_file:
       ensure  => file,
       content => $config_file_contents,
+    }
+  } else {
+    file { $config_dir:
+      ensure => directory,
     }
   }
 
