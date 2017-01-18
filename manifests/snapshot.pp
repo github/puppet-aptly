@@ -21,7 +21,7 @@ define aptly::snapshot (
 
   $aptly_cmd = "${::aptly::aptly_cmd} snapshot"
 
-  $cli_options_string = join(reject(join_keys_to_values($cli_options, '='), '.*=$'), ' ')
+  $cli_options_string = join(join_keys_to_values($cli_options, '='), ' ')
 
   # Since the create and show commands don't share a common set of
   # options, we need to extract the config

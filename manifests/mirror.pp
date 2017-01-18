@@ -86,7 +86,7 @@ define aptly::mirror (
     ]
   }
 
-  $cli_options_string = join(reject(join_keys_to_values($cli_options, '='), '.*=$'), ' ')
+  $cli_options_string = join(join_keys_to_values($cli_options, '='), ' ')
   $cmd_string         = rstrip("${aptly_cmd} create ${cli_options_string} ${title} ${location} ${release} ${components}")
 
   # Since the create and show commands don't share a common set of
