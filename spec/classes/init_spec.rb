@@ -114,11 +114,11 @@ EOS
     end
   end
 
-  describe '#create_config' do
+  describe '#single_root' do
     context 'true' do
       let(:params) {{
         :config_contents => '{"rootDir":"/srv/aptly", "architectures":["i386", "amd64"]}',
-        :create_config   => true,
+        :single_root     => true,
       }}
 
       it {
@@ -129,10 +129,11 @@ EOS
     context 'false' do
       let(:params) {{
         :config_contents => '{"rootDir":"/srv/aptly", "architectures":["i386", "amd64"]}',
-        :create_config   => false,
+        :single_root     => false,
       }}
 
       it { should_not contain_file('/etc/aptly.conf') }
+      it { should contain_file('/etc/aptly.conf.d') }
     end
   end
 
