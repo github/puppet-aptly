@@ -66,6 +66,7 @@ class aptly (
 ) {
 
   validate_absolute_path($config_file)
+  validate_absolute_path($config_dir)
   validate_hash($config)
   validate_bool($single_root)
   validate_hash($aptly_repos)
