@@ -21,8 +21,8 @@
 #   See http://www.aptly.info/#configuration
 #   Default: {}
 #
-# [*create_config*]
-#   Whether to create a config file or not
+# [*single_root*]
+#   Whether we plan to use one aptly root or not.
 #   Default: true
 #
 # [*repo*]
@@ -52,7 +52,7 @@ class aptly (
   $config_file     = '/etc/aptly.conf',
   $config          = {},
   $config_contents = undef,
-  $create_config   = true,
+  $single_root     = true,
   $repo            = true,
   $key_server      = undef,
   $user            = 'root',
@@ -62,7 +62,7 @@ class aptly (
 
   validate_absolute_path($config_file)
   validate_hash($config)
-  validate_bool($create_config)
+  validate_bool($single_root)
   validate_hash($aptly_repos)
   validate_hash($aptly_mirrors)
   validate_bool($repo)
@@ -90,7 +90,7 @@ class aptly (
     ensure  => $package_ensure,
   }
 
-  if $create_config {
+  if $single_root {
     $config_file_contents = $config_contents ? {
       undef   => inline_template("<%= Hash[@config.sort].to_pson %>\n"),
       default => $config_contents,
