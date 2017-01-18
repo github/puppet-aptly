@@ -90,9 +90,10 @@ define aptly::mirror (
   $cmd_string         = rstrip("${aptly_cmd} create ${cli_options_string} ${title} ${location} ${release} ${components}")
 
   # Since the create and show commands don't share a common set of
-  # options, we need to extract the config
-  if has_key($cli_options, '-config') {
-    $config_string = "-config=${cli_options['-config']}"
+  # options, we need to extract the config if it has been specified.
+  $config_path_specified = has_key($cli_options, '-config')
+  if $config_path_specified {
+    $config_string="-config=${cli_options['-config']}"
   } else {
     $config_string = ''
   }

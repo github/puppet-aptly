@@ -24,9 +24,10 @@ define aptly::snapshot (
   $cli_options_string = join(join_keys_to_values($cli_options, '='), ' ')
 
   # Since the create and show commands don't share a common set of
-  # options, we need to extract the config
-  if has_key($cli_options, '-config') {
-    $config_string = "-config=${cli_options['-config']}"
+  # options, we need to extract the config if it has been specified.
+  $config_path_specified = has_key($cli_options, '-config')
+  if $config_path_specified {
+    $config_string="-config=${cli_options['-config']}"
   } else {
     $config_string = ''
   }
