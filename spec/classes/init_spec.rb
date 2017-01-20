@@ -65,6 +65,30 @@ describe 'aptly' do
     end
   end
 
+  describe '#config_dir' do
+    context 'not an absolute path' do
+      let(:params) {{
+        :config_dir  => 'relativepath/aptly.conf.d',
+        :single_root => false,
+      }}
+
+      it {
+        should raise_error(Puppet::Error, /is not an absolute path/)
+      }
+    end
+
+    context 'custom config path' do
+      let(:params) {{
+        :config_dir  => '/tmp/aptly.conf.d',
+        :single_root => false,
+      }}
+
+      it {
+        should contain_file('/tmp/aptly.conf.d')
+      }
+    end
+  end
+
   describe '#config' do
     context 'not a hash' do
       let(:params) {{
@@ -111,6 +135,29 @@ EOS
       it {
         should contain_file('/etc/aptly.conf').with_content(params[:config_contents])
       }
+    end
+  end
+
+  describe '#single_root' do
+    context 'true' do
+      let(:params) {{
+        :config_contents => '{"rootDir":"/srv/aptly", "architectures":["i386", "amd64"]}',
+        :single_root     => true,
+      }}
+
+      it {
+        should contain_file('/etc/aptly.conf').with_content(params[:config_contents])
+      }
+    end
+
+    context 'false' do
+      let(:params) {{
+        :config_contents => '{"rootDir":"/srv/aptly", "architectures":["i386", "amd64"]}',
+        :single_root     => false,
+      }}
+
+      it { should_not contain_file('/etc/aptly.conf') }
+      it { should contain_file('/etc/aptly.conf.d') }
     end
   end
 

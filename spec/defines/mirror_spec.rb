@@ -24,12 +24,11 @@ describe 'aptly::mirror' do
 
     it {
       should contain_exec('aptly_mirror_create-example').with({
-        :command => /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/,
-        :unless  => /aptly -config \/etc\/aptly.conf mirror show example >\/dev\/null$/,
+        :command => /aptly mirror create *example http:\/\/repo\.example\.com precise$/,
+        :unless  => /aptly mirror show *example >\/dev\/null$/,
         :user    => 'root',
         :require => [
           'Package[aptly]',
-          'File[/etc/aptly.conf]',
           'Exec[aptly_mirror_gpg-example]'
         ],
       })
@@ -72,12 +71,11 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with({
-          :command => /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/,
-          :unless  => /aptly -config \/etc\/aptly.conf mirror show example >\/dev\/null$/,
+          :command => /aptly mirror create *example http:\/\/repo\.example\.com precise$/,
+          :unless  => /aptly mirror show *example >\/dev\/null$/,
           :user    => 'custom_user',
           :require => [
             'Package[aptly]',
-            'File[/etc/aptly.conf]',
             'Exec[aptly_mirror_gpg-example]'
           ],
         })
@@ -222,7 +220,7 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise main$/
+          /aptly mirror create *example http:\/\/repo\.example\.com precise main$/
         )
       }
     end
@@ -236,18 +234,18 @@ describe 'aptly::mirror' do
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise main contrib non-free$/
+          /aptly mirror create *example http:\/\/repo\.example\.com precise main contrib non-free$/
         )
       }
     end
   end
 
-  describe '#cmd_options' do
+  describe '#cli_options' do
     context 'not a hash' do
       let(:params) {{
         :location    => 'http://repo.example.com',
         :key         => 'ABC123',
-        :cmd_options => 'this is a string',
+        :cli_options => 'this is a string',
       }}
 
       it {
@@ -255,52 +253,42 @@ describe 'aptly::mirror' do
       }
     end
 
-    context 'with valid options' do
-      let(:params) {{
-        :location    => 'http://repo.example.com',
-        :key         => 'ABC123',
-        :cmd_options => {
-          '-with-sources'     => false,
-          '-with-udebs'       => false,
-          '-force-components' => false,
-        }
-      }}
-
-      it {
-        should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/
-        )
-      }
-    end
-
-    context 'default options' do
-      let(:params) {{
-        :location    => 'http://repo.example.com',
-        :key         => 'ABC123',
-        :cmd_options => {}
-      }}
-
-      it {
-        should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=false example http:\/\/repo\.example\.com precise$/
-        )
-      }
-    end
-
     context 'overriding options' do
       let(:params) {{
         :location    => 'http://repo.example.com',
         :key         => 'ABC123',
-        :cmd_options => {
+        :cli_options => {
           '-force-components' => true,
         }
       }}
 
       it {
         should contain_exec('aptly_mirror_create-example').with_command(
-          /aptly -config \/etc\/aptly.conf mirror create -with-sources=false -with-udebs=false -force-components=true example http:\/\/repo\.example\.com precise$/
+          /aptly mirror create -force-components=true example http:\/\/repo\.example\.com precise$/
         )
       }
     end
+  end
+
+  describe 'user defined configuration' do
+    let(:params){{
+      :location => 'http://repo.example.com',
+      :key      => 'ABC123',
+      :cli_options => {
+        '-config' => '/tmp/aptly.conf'
+      }
+    }}
+
+    it {
+      should contain_exec('aptly_mirror_create-example').with({
+        :command => /aptly mirror create -config=\/tmp\/aptly.conf example http:\/\/repo\.example\.com precise$/,
+        :unless  => /aptly mirror show -config=\/tmp\/aptly.conf example >\/dev\/null$/,
+        :user    => 'root',
+        :require => [
+          'Package[aptly]',
+          'Exec[aptly_mirror_gpg-example]'
+        ],
+      })
+    }
   end
 end

@@ -36,7 +36,7 @@
 #   Example: ['http_proxy=http://127.0.0.2:3128']
 #   Default: []
 #
-# [*cmd_options*]
+# [*cli_options*]
 #   Hash containing the command line options that will be passed to aptly.
 #
 define aptly::mirror (
@@ -46,19 +46,12 @@ define aptly::mirror (
   $release          = $::lsbdistcodename,
   $repos            = [],
   $environment      = [],
-  $cmd_options      = {},
+  $cli_options      = {},
 ) {
   validate_string($keyserver)
   validate_array($repos)
   validate_array($environment)
-  validate_hash($cmd_options)
-
-  $default_cmd_options = {
-    '-architectures'    => '',
-    '-with-sources'     => false,
-    '-with-udebs'       => false,
-    '-force-components' => false,
-  }
+  validate_hash($cli_options)
 
   include ::aptly
 
@@ -85,22 +78,29 @@ define aptly::mirror (
 
     $exec_aptly_mirror_create_require = [
       Package['aptly'],
-      File['/etc/aptly.conf'],
       Exec["aptly_mirror_gpg-${title}"],
     ]
   } else {
     $exec_aptly_mirror_create_require = [
       Package['aptly'],
-      File['/etc/aptly.conf'],
     ]
   }
 
-  $cmd_options_string = join(reject(join_keys_to_values(merge($default_cmd_options, $cmd_options), '='), '.*=$'), ' ')
-  $cmd_string         = rstrip("${aptly_cmd} create ${cmd_options_string} ${title} ${location} ${release} ${components}")
+  $cli_options_string = join(join_keys_to_values($cli_options, '='), ' ')
+  $cmd_string         = rstrip("${aptly_cmd} create ${cli_options_string} ${title} ${location} ${release} ${components}")
+
+  # Since the create and show commands don't share a common set of
+  # options, we need to extract the config if it has been specified.
+  $config_path_specified = has_key($cli_options, '-config')
+  if $config_path_specified {
+    $config_string="-config=${cli_options['-config']}"
+  } else {
+    $config_string = ''
+  }
 
   exec { "aptly_mirror_create-${title}":
     command     => $cmd_string,
-    unless      => "${aptly_cmd} show ${title} >/dev/null",
+    unless      => "${aptly_cmd} show ${config_string} ${title} >/dev/null",
     user        => $::aptly::user,
     require     => $exec_aptly_mirror_create_require,
     environment => $environment,

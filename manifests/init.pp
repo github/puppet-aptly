@@ -11,7 +11,11 @@
 # [*config_file*]
 #   Absolute path to the configuration file. Defaults to
 #   `/etc/aptly.conf`.
-
+#
+# [*config_dir*]
+#   Absolute path to the configuration directory, used in multi root
+#   setups. Defaults to `/etc/aptly.conf.d`.
+#
 # [*config_contents*]
 #   Contents of the config file.
 #   Default: undef
@@ -20,6 +24,10 @@
 #   Hash of configuration options for `/etc/aptly.conf`.
 #   See http://www.aptly.info/#configuration
 #   Default: {}
+#
+# [*single_root*]
+#   Whether we plan to use one aptly root or not.
+#   Default: true
 #
 # [*repo*]
 #   Whether to configure an apt::source for `repo.aptly.info`.
@@ -46,8 +54,10 @@
 class aptly (
   $package_ensure  = present,
   $config_file     = '/etc/aptly.conf',
+  $config_dir      = '/etc/aptly.conf.d',
   $config          = {},
   $config_contents = undef,
+  $single_root     = true,
   $repo            = true,
   $key_server      = undef,
   $user            = 'root',
@@ -56,7 +66,9 @@ class aptly (
 ) {
 
   validate_absolute_path($config_file)
+  validate_absolute_path($config_dir)
   validate_hash($config)
+  validate_bool($single_root)
   validate_hash($aptly_repos)
   validate_hash($aptly_mirrors)
   validate_bool($repo)
@@ -84,17 +96,23 @@ class aptly (
     ensure  => $package_ensure,
   }
 
-  $config_file_contents = $config_contents ? {
-    undef   => inline_template("<%= Hash[@config.sort].to_pson %>\n"),
-    default => $config_contents,
+  if $single_root {
+    $config_file_contents = $config_contents ? {
+      undef   => inline_template("<%= Hash[@config.sort].to_pson %>\n"),
+      default => $config_contents,
+    }
+
+    file { $config_file:
+      ensure  => file,
+      content => $config_file_contents,
+    }
+  } else {
+    file { $config_dir:
+      ensure => directory,
+    }
   }
 
-  file { $config_file:
-    ensure  => file,
-    content => $config_file_contents,
-  }
-
-  $aptly_cmd = "/usr/bin/aptly -config ${config_file}"
+  $aptly_cmd = '/usr/bin/aptly'
 
   # Hiera support
   create_resources('::aptly::repo', $aptly_repos)

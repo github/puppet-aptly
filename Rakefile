@@ -21,8 +21,12 @@ exclude_paths = [
   "vendor/**/*",
   "spec/**/*",
 ]
-PuppetLint.configuration.ignore_paths = exclude_paths
 PuppetSyntax.exclude_paths = exclude_paths
+
+PuppetLint::RakeTask.new :lint do |config|
+  config.relative = true
+  config.ignore_paths = exclude_paths
+end
 
 desc "Run syntax, lint, and spec tests."
 task :test => [
