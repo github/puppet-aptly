@@ -11,13 +11,26 @@
 #   Create snapshot from given mirror.
 #
 define aptly::snapshot (
-  $repo   = undef,
-  $mirror = undef,
+  $repo        = undef,
+  $mirror      = undef,
+  $cli_options = {},
 ) {
+  validate_hash($cli_options)
 
   include aptly
 
   $aptly_cmd = "${::aptly::aptly_cmd} snapshot"
+
+  $cli_options_string = join(join_keys_to_values($cli_options, '='), ' ')
+
+  # Since the create and show commands don't share a common set of
+  # options, we need to extract the config if it has been specified.
+  $config_path_specified = has_key($cli_options, '-config')
+  if $config_path_specified {
+    $config_string="-config=${cli_options['-config']}"
+  } else {
+    $config_string = ''
+  }
 
   if $repo and $mirror {
     fail('$repo and $mirror are mutually exclusive.')
@@ -33,8 +46,8 @@ define aptly::snapshot (
   }
 
   exec { "aptly_snapshot_create-${title}":
-    command => "${aptly_cmd} ${aptly_args}",
-    unless  => "${aptly_cmd} show ${title} >/dev/null",
+    command => "${aptly_cmd} ${cli_options_string} ${aptly_args}",
+    unless  => "${aptly_cmd} ${config_string} show ${title} >/dev/null",
     user    => $::aptly::user,
     require => Class['aptly'],
   }
