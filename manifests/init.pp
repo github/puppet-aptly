@@ -109,6 +109,7 @@ class aptly (
   } else {
     file { $config_dir:
       ensure => directory,
+      mode   => '0755',
     }
   }
 
